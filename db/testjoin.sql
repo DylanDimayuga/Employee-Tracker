@@ -10,7 +10,7 @@ SELECT employee.id, employee.first_name, employee.last_name, role.title, employe
 FROM employee
 JOIN role ON employee.role_id = role.id;
 
-SELECT *
+SELECT employee.id AS employee_id, employee.first_name, employee.last_name, role.title AS job_title, department.name AS department, role.salary, employee.manager_id
 FROM department
 INNER JOIN role ON role.department_id = department.id
 INNER JOIN employee ON employee.role_id = role.id;
