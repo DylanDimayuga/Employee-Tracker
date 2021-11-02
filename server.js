@@ -75,27 +75,27 @@ function addEmp() {
             name: 'manager',
             choices: empNames
         }];
-    const first_name;
-    const last_name;
-    const role_id;
-    const manager_id;
+    const firstName;
+    const lastName;
+    const roleId;
+    const managerId;
     inquirer.prompt(newEmpQs)
     .then((data) => {
-        first_name = data.firstName.trim();
-        last_name = data.lastName.trim();
+        firstName = data.firstName.trim();
+        lastName = data.lastName.trim();
         for (let i = 0; i < roleList.length; i++) {
             if (data.role === roleList[i].title) {
-                role_id = roleList[i].id
+                roleId = roleList[i].id
             }
         }
         for (let i = 0; i < empList.length; i++) {
-            const firstLastName = response.manager.split(" ");
+            const firstLastName = data.manager.split(" ");
             if (firstLastName[0] === empList[i].first_name && firstLastName[1] === empList[i].last_name) {
-                manager_id = empList[i].id
+                managerId = empList[i].id
             }
         }
     })
-    db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)' [first_name, last_name, role_id, manager_id])
+    db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);', [firstName, lastName, roleId, managerId]);
     updateEmpList();
     selectOption();
     console.log('Employee added successfully!')
@@ -123,7 +123,49 @@ function allRoles() {
 }
 
 function addRole() {
+    const roleQuestions = [
+        {
+            type: 'input',
+            message: 'What role would you like to add?',
+            name: 'roleTitle'
+        },
+        {
+            type: 'input',
+            message: 'What is the salary of this role? (No commas or dollar signs)',
+            name: 'salary'
+        },
+        {
+            type: 'input',
+            message: 'What department is this role a part of?',
+            name: 'dept',
+            choices: deptNames
+        }]
+    const title;
+    const salary;
+    const departmentId;
+    inquirer.prompt(roleQuestions)
+        .then((data) => {
+            title = data.roleTitle;
+            salary = data.salary;
+            for (let i = 0; i < deptList.length; i++) {
+                if (data.deptNames === departmentList[i].name) {
+                    departmentId = departmentList[i].id
+                }
+            }
+        })
+        db.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?);', [title, salary, departmentId]);
+        updateRoleList();
+        console.log('Role added successfully!')
+}
 
+function updateRoleList() {
+    const roles = db.query('SELECT * FROM role')
+    roleList = [];
+    roleNames = [];
+    for (let i = 0; i < roles.length; i++) {
+        roleList.push({ id: roles[i].id, title: roles[i].title, salary: roles[i].salary, department_id: roles[i].department_id});
+        roleNames.push(roles[i].title);
+    }
 }
 
 function allDept() {
@@ -134,7 +176,27 @@ function allDept() {
 }
 
 function addDept() {
-
+    const deptQuestions = 
+        {
+            type: 'input',
+            message: 'What is the new department name',
+            name: 'deptName'
+        }
+    let name;
+    inquirer.prompt(deptQuestions)
+        .then((data) => name = response.deptQuestions);
+    db.query('INSERT INTO department (name) VALUES (?);', [name])
+    updateDeptList()
+    console.log('Department added successfully!')
 }
 
+function updateDeptList() {
+    const depts = db.query('SELECT * FROM department');
+    deptList = [];
+    deptNames = [];
+    for (let i = 0; i < depts.length; i++) {
+        deptList.push({ id: depts[i].id, name: depts[i].name });
+        deptNames.push(roles[i].title);
+    }
+}
 
